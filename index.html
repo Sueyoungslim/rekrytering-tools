@@ -612,6 +612,7 @@
           </div>
           ${u.bio ? `<div class="bio">${esc(u.bio)}</div>` : ''}
           ${u.location ? `<div class="location">&#128205; ${esc(u.location)}</div>` : ''}
+          ${u.email ? `<div class="location">&#9993; <a href="mailto:${esc(u.email)}" style="color:inherit;">${esc(u.email)}</a></div>` : ''}
           <div class="stats">
             <span>&#128230; ${u.public_repos} repos</span>
             <span>&#128101; ${u.followers} followers</span>
@@ -632,9 +633,9 @@
       if (filterHireable.checked) {
         data = candidates.filter(u => u.hireable);
       }
-      const header = 'username,name,bio,location,repos,followers,hireable,profile_url';
+      const header = 'username,name,email,bio,location,repos,followers,hireable,profile_url';
       const rows = data.map(u =>
-        [u.login, u.name || '', u.bio || '', u.location || '', u.public_repos, u.followers, u.hireable ? 'yes' : 'no', u.html_url]
+        [u.login, u.name || '', u.email || '', u.bio || '', u.location || '', u.public_repos, u.followers, u.hireable ? 'yes' : 'no', u.html_url]
           .map(v => `"${String(v).replace(/"/g, '""')}"`)
           .join(',')
       );
