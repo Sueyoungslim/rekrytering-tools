@@ -13,6 +13,8 @@
       --text: #1e293b;
       --text-muted: #64748b;
       --border: #e2e8f0;
+      --green: #059669;
+      --green-bg: #ecfdf5;
       --radius: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
       --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
@@ -50,6 +52,60 @@
       max-width: 1100px;
       margin: 0 auto;
       padding: 2rem 1rem;
+    }
+
+    .token-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .token-bar label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .token-bar input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .token-bar input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    .token-bar .token-status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .token-bar .token-status.active {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .token-bar button {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
     }
 
     .search-form {
@@ -90,6 +146,10 @@
       box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
     }
 
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
     button {
       padding: 0.6rem 1.5rem;
       border: none;
@@ -110,8 +170,15 @@
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    .btn-secondary {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover { background: #cbd5e1; }
+
     .btn-export {
-      background: #059669;
+      background: var(--green);
       color: #fff;
       margin-top: 1rem;
     }
@@ -141,6 +208,28 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      user-select: none;
+    }
+
+    .filter-bar input[type="checkbox"] {
+      accent-color: var(--primary);
+    }
 
     .results-grid {
       display: grid;
@@ -179,6 +268,13 @@
       object-fit: cover;
     }
 
+    .card-header .name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
     .card-header .name {
       font-weight: 700;
       font-size: 1.05rem;
@@ -187,6 +283,19 @@
     .card-header .username {
       color: var(--text-muted);
       font-size: 0.85rem;
+    }
+
+    .badge-hireable {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
     }
 
     .card .bio {
@@ -230,11 +339,22 @@
 <body>
   <header>
     <h1>GitHub Rekryteringsverktyg</h1>
-    <p>Sök efter utvecklare baserat på språk, plats och aktivitet</p>
+    <p>Sök efter utvecklare baserat på nyckelord, språk, plats och aktivitet</p>
   </header>
 
   <main>
+    <div class="token-bar">
+      <label for="token">API-token</label>
+      <input type="password" id="token" placeholder="ghp_... (valfritt, ger fler sökningar)">
+      <span class="token-status" id="tokenStatus">Ej ansluten</span>
+      <button class="btn-secondary" type="button" id="tokenBtn">Spara</button>
+    </div>
+
     <form class="search-form" id="searchForm">
+      <div class="field field-wide">
+        <label for="keyword">Fritextsökning</label>
+        <input type="text" id="keyword" placeholder="t.ex. &quot;machine learning&quot;, senior, fullstack, devops">
+      </div>
       <div class="field">
         <label for="language">Programmeringsspråk</label>
         <input type="text" id="language" placeholder="t.ex. javascript">
@@ -258,6 +378,10 @@
 
     <div class="status" id="status"></div>
 
+    <div id="filterBar" class="filter-bar" style="display:none;">
+      <label><input type="checkbox" id="filterHireable"> Visa bara öppna för jobb</label>
+    </div>
+
     <div class="results-grid" id="results"></div>
 
     <div class="export-wrap" id="exportWrap">
@@ -272,9 +396,56 @@
     const exportWrap = document.getElementById('exportWrap');
     const exportBtn = document.getElementById('exportBtn');
     const searchBtn = document.getElementById('searchBtn');
+    const tokenInput = document.getElementById('token');
+    const tokenBtn = document.getElementById('tokenBtn');
+    const tokenStatus = document.getElementById('tokenStatus');
+    const filterBar = document.getElementById('filterBar');
+    const filterHireable = document.getElementById('filterHireable');
 
     let candidates = [];
 
+    // --- Token management ---
+    function getToken() {
+      return localStorage.getItem('gh_token') || '';
+    }
+
+    function loadTokenUI() {
+      const t = getToken();
+      if (t) {
+        tokenInput.value = t;
+        tokenStatus.textContent = 'Ansluten';
+        tokenStatus.className = 'token-status active';
+        tokenBtn.textContent = 'Ta bort';
+      } else {
+        tokenInput.value = '';
+        tokenStatus.textContent = 'Ej ansluten';
+        tokenStatus.className = 'token-status';
+        tokenBtn.textContent = 'Spara';
+      }
+    }
+
+    tokenBtn.addEventListener('click', () => {
+      if (getToken()) {
+        localStorage.removeItem('gh_token');
+      } else {
+        const v = tokenInput.value.trim();
+        if (!v) return;
+        localStorage.setItem('gh_token', v);
+      }
+      loadTokenUI();
+    });
+
+    loadTokenUI();
+
+    // --- Auth headers ---
+    function apiHeaders() {
+      const h = { 'Accept': 'application/vnd.github.v3+json' };
+      const t = getToken();
+      if (t) h['Authorization'] = `Bearer ${t}`;
+      return h;
+    }
+
+    // --- Search ---
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       await search();
@@ -282,13 +453,19 @@
 
     exportBtn.addEventListener('click', () => downloadCSV());
 
+    filterHireable.addEventListener('change', () => {
+      renderCards(candidates);
+    });
+
     async function search() {
+      const keyword = document.getElementById('keyword').value.trim();
       const lang = document.getElementById('language').value.trim();
       const loc = document.getElementById('location').value.trim();
       const repos = document.getElementById('repos').value.trim();
       const followers = document.getElementById('followers').value.trim();
 
       const parts = [];
+      if (keyword) parts.push(keyword);
       if (lang) parts.push(`language:${lang}`);
       if (loc) parts.push(`location:${loc}`);
       if (repos) parts.push(`repos:>=${repos}`);
@@ -303,17 +480,24 @@
       searchBtn.disabled = true;
       resultsEl.innerHTML = '';
       exportWrap.style.display = 'none';
+      filterBar.style.display = 'none';
+      filterHireable.checked = false;
       candidates = [];
       setStatus('<span class="spinner"></span> Söker...');
 
       try {
         const res = await fetch(
           `https://api.github.com/search/users?q=${encodeURIComponent(query)}&per_page=10`,
-          { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+          { headers: apiHeaders() }
         );
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
+          if (res.status === 401) {
+            localStorage.removeItem('gh_token');
+            loadTokenUI();
+            throw new Error('Ogiltigt API-token. Token har tagits bort.');
+          }
           throw new Error(body.message || `HTTP ${res.status}`);
         }
 
@@ -336,7 +520,12 @@
           return;
         }
 
-        setStatus(`${candidates.length} kandidat${candidates.length === 1 ? '' : 'er'} hittade.`);
+        const hireableCount = candidates.filter(u => u.hireable).length;
+        setStatus(
+          `${candidates.length} kandidat${candidates.length === 1 ? '' : 'er'} hittade` +
+          (hireableCount > 0 ? ` (${hireableCount} öppna för jobb).` : '.')
+        );
+        filterBar.style.display = 'flex';
         renderCards(candidates);
         exportWrap.style.display = 'block';
       } catch (err) {
@@ -349,7 +538,7 @@
     async function fetchUser(username) {
       try {
         const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-          headers: { 'Accept': 'application/vnd.github.v3+json' }
+          headers: apiHeaders()
         });
         if (!res.ok) return null;
         return await res.json();
@@ -364,12 +553,25 @@
     }
 
     function renderCards(users) {
-      resultsEl.innerHTML = users.map(u => `
+      let filtered = users;
+      if (filterHireable.checked) {
+        filtered = users.filter(u => u.hireable);
+      }
+
+      if (filtered.length === 0) {
+        resultsEl.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Inga kandidater matchar filtret.</p>';
+        return;
+      }
+
+      resultsEl.innerHTML = filtered.map(u => `
         <div class="card">
           <div class="card-header">
             <img src="${u.avatar_url}" alt="${esc(u.login)}">
             <div>
-              <div class="name">${esc(u.name || u.login)}</div>
+              <div class="name-row">
+                <span class="name">${esc(u.name || u.login)}</span>
+                ${u.hireable ? '<span class="badge-hireable">Öppen för jobb</span>' : ''}
+              </div>
               <div class="username">@${esc(u.login)}</div>
             </div>
           </div>
@@ -391,9 +593,13 @@
     }
 
     function downloadCSV() {
-      const header = 'username,name,bio,location,repos,followers,profile_url';
-      const rows = candidates.map(u =>
-        [u.login, u.name || '', u.bio || '', u.location || '', u.public_repos, u.followers, u.html_url]
+      let data = candidates;
+      if (filterHireable.checked) {
+        data = candidates.filter(u => u.hireable);
+      }
+      const header = 'username,name,bio,location,repos,followers,hireable,profile_url';
+      const rows = data.map(u =>
+        [u.login, u.name || '', u.bio || '', u.location || '', u.public_repos, u.followers, u.hireable ? 'yes' : 'no', u.html_url]
           .map(v => `"${String(v).replace(/"/g, '""')}"`)
           .join(',')
       );
