@@ -385,6 +385,7 @@
     <div class="results-grid" id="results"></div>
 
     <div class="export-wrap" id="exportWrap">
+      <button class="btn-primary" id="loadMoreBtn" style="display:none;">Ladda fler</button>
       <button class="btn-export" id="exportBtn">Exportera CSV</button>
     </div>
   </main>
@@ -403,6 +404,13 @@
     const filterHireable = document.getElementById('filterHireable');
 
     let candidates = [];
+    let currentQuery = '';
+    let currentPage = 1;
+    let totalCount = 0;
+    const perPage = 10;
+
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    loadMoreBtn.addEventListener('click', () => loadMore());
 
     // --- Token management ---
     function getToken() {
@@ -476,18 +484,32 @@
         return;
       }
 
-      const query = parts.join(' ');
-      searchBtn.disabled = true;
+      currentQuery = parts.join(' ');
+      currentPage = 1;
+      totalCount = 0;
+      candidates = [];
       resultsEl.innerHTML = '';
       exportWrap.style.display = 'none';
+      loadMoreBtn.style.display = 'none';
       filterBar.style.display = 'none';
       filterHireable.checked = false;
-      candidates = [];
-      setStatus('<span class="spinner"></span> Söker...');
+
+      await fetchPage();
+    }
+
+    async function loadMore() {
+      currentPage++;
+      await fetchPage();
+    }
+
+    async function fetchPage() {
+      searchBtn.disabled = true;
+      loadMoreBtn.disabled = true;
+      setStatus(`<span class="spinner"></span> ${currentPage === 1 ? 'Söker' : 'Laddar fler'}...`);
 
       try {
         const res = await fetch(
-          `https://api.github.com/search/users?q=${encodeURIComponent(query)}&per_page=10`,
+          `https://api.github.com/search/users?q=${encodeURIComponent(currentQuery)}&per_page=${perPage}&page=${currentPage}`,
           { headers: apiHeaders() }
         );
 
@@ -502,8 +524,14 @@
         }
 
         const data = await res.json();
+        totalCount = data.total_count;
+
         if (data.items.length === 0) {
-          setStatus('Inga användare hittades. Prova andra kriterier.');
+          if (currentPage === 1) {
+            setStatus('Inga användare hittades. Prova andra kriterier.');
+          } else {
+            setStatus(statusText());
+          }
           return;
         }
 
@@ -513,26 +541,33 @@
           data.items.map(u => fetchUser(u.login))
         );
 
-        candidates = details.filter(Boolean);
+        const newCandidates = details.filter(Boolean);
+        candidates = candidates.concat(newCandidates);
 
         if (candidates.length === 0) {
           setStatus('Kunde inte hämta användardetaljer. Försök igen senare.', true);
           return;
         }
 
-        const hireableCount = candidates.filter(u => u.hireable).length;
-        setStatus(
-          `${candidates.length} kandidat${candidates.length === 1 ? '' : 'er'} hittade` +
-          (hireableCount > 0 ? ` (${hireableCount} öppna för jobb).` : '.')
-        );
+        setStatus(statusText());
         filterBar.style.display = 'flex';
         renderCards(candidates);
         exportWrap.style.display = 'block';
+
+        const loaded = currentPage * perPage;
+        loadMoreBtn.style.display = loaded < totalCount ? 'inline-block' : 'none';
       } catch (err) {
         setStatus(`Fel: ${err.message}`, true);
       } finally {
         searchBtn.disabled = false;
+        loadMoreBtn.disabled = false;
       }
+    }
+
+    function statusText() {
+      const hireableCount = candidates.filter(u => u.hireable).length;
+      const showing = `Visar ${candidates.length} av ${totalCount} träffar`;
+      return showing + (hireableCount > 0 ? ` (${hireableCount} öppna för jobb).` : '.');
     }
 
     async function fetchUser(username) {
