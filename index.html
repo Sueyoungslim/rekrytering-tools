@@ -15,6 +15,8 @@
       --border: #e2e8f0;
       --green: #059669;
       --green-bg: #ecfdf5;
+      --yellow: #d97706;
+      --yellow-bg: #fffbeb;
       --radius: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
       --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
@@ -37,10 +39,7 @@
       text-align: center;
     }
 
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
 
     header p {
       color: var(--text-muted);
@@ -54,6 +53,7 @@
       padding: 2rem 1rem;
     }
 
+    /* Token + rate limit bar */
     .token-bar {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -103,11 +103,19 @@
       font-weight: 600;
     }
 
-    .token-bar button {
-      padding: 0.4rem 0.9rem;
+    .token-bar button { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+
+    .rate-limit {
       font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-left: auto;
+      white-space: nowrap;
     }
 
+    .rate-limit.warn { color: var(--yellow); font-weight: 600; }
+    .rate-limit.danger { color: #dc2626; font-weight: 600; }
+
+    /* Search form */
     .search-form {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -130,25 +138,24 @@
       margin-bottom: 0.35rem;
     }
 
-    .field input {
+    .field input, .field select {
       width: 100%;
       padding: 0.6rem 0.75rem;
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 0.95rem;
       color: var(--text);
+      background: var(--surface);
       transition: border-color 0.15s;
     }
 
-    .field input:focus {
+    .field input:focus, .field select:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
     }
 
-    .field-wide {
-      grid-column: 1 / -1;
-    }
+    .field-wide { grid-column: 1 / -1; }
 
     button {
       padding: 0.6rem 1.5rem;
@@ -162,27 +169,14 @@
 
     button:active { transform: scale(0.97); }
 
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-    }
-
+    .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .btn-secondary {
-      background: var(--border);
-      color: var(--text);
-    }
-
+    .btn-secondary { background: var(--border); color: var(--text); }
     .btn-secondary:hover { background: #cbd5e1; }
 
-    .btn-export {
-      background: var(--green);
-      color: #fff;
-      margin-top: 1rem;
-    }
-
+    .btn-export { background: var(--green); color: #fff; margin-top: 1rem; }
     .btn-export:hover { background: #047857; }
 
     .status {
@@ -209,15 +203,17 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .filter-bar {
+    /* Filter + sort bar */
+    .toolbar {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 1rem;
       margin-bottom: 0.75rem;
       flex-wrap: wrap;
+      display: none;
     }
 
-    .filter-bar label {
+    .toolbar label {
       font-size: 0.85rem;
       color: var(--text-muted);
       cursor: pointer;
@@ -227,10 +223,29 @@
       user-select: none;
     }
 
-    .filter-bar input[type="checkbox"] {
-      accent-color: var(--primary);
+    .toolbar input[type="checkbox"] { accent-color: var(--primary); }
+
+    .toolbar select {
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--text);
+      background: var(--surface);
     }
 
+    .toolbar .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-left: auto;
+    }
+
+    .toolbar .sort-group label {
+      cursor: default;
+    }
+
+    /* Results grid */
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -248,6 +263,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      position: relative;
     }
 
     .card:hover {
@@ -275,15 +291,8 @@
       flex-wrap: wrap;
     }
 
-    .card-header .name {
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .card-header .username {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
+    .card-header .name { font-weight: 700; font-size: 1.05rem; }
+    .card-header .username { color: var(--text-muted); font-size: 0.85rem; }
 
     .badge-hireable {
       display: inline-block;
@@ -298,16 +307,8 @@
       padding: 0.1rem 0.4rem;
     }
 
-    .card .bio {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      flex-grow: 1;
-    }
-
-    .card .location {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
+    .card .bio { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
+    .card .meta-line { font-size: 0.85rem; color: var(--text-muted); }
 
     .card .stats {
       display: flex;
@@ -319,20 +320,54 @@
 
     .card .stats span { display: flex; align-items: center; gap: 0.3rem; }
 
-    .card a {
-      display: inline-block;
+    .card-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
       margin-top: 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    .card-links a {
       color: var(--primary);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
     }
 
-    .card a:hover { text-decoration: underline; }
+    .card-links a:hover { text-decoration: underline; }
 
+    .card-links .linkedin-link { color: #0a66c2; }
+
+    /* Star / favorite button */
+    .star-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.2rem;
+      line-height: 1;
+      opacity: 0.35;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+
+    .star-btn:hover { opacity: 0.7; transform: scale(1.15); }
+    .star-btn.active { opacity: 1; }
+
+    /* Export section */
     .export-wrap {
       text-align: center;
       display: none;
+    }
+
+    .export-wrap .export-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -348,6 +383,7 @@
       <input type="password" id="token" placeholder="ghp_... (valfritt, ger fler sökningar)">
       <span class="token-status" id="tokenStatus">Ej ansluten</span>
       <button class="btn-secondary" type="button" id="tokenBtn">Spara</button>
+      <span class="rate-limit" id="rateLimit"></span>
     </div>
 
     <form class="search-form" id="searchForm">
@@ -378,39 +414,77 @@
 
     <div class="status" id="status"></div>
 
-    <div id="filterBar" class="filter-bar" style="display:none;">
-      <label><input type="checkbox" id="filterHireable"> Visa bara öppna för jobb</label>
+    <div class="toolbar" id="toolbar">
+      <label><input type="checkbox" id="filterHireable"> Öppna för jobb</label>
+      <label><input type="checkbox" id="filterFavorites"> Bara favoriter</label>
+      <div class="sort-group">
+        <label>Sortera:</label>
+        <select id="sortSelect">
+          <option value="">Standard</option>
+          <option value="followers">Followers</option>
+          <option value="repos">Repos</option>
+          <option value="updated">Senast aktiv</option>
+        </select>
+      </div>
     </div>
 
     <div class="results-grid" id="results"></div>
 
     <div class="export-wrap" id="exportWrap">
       <button class="btn-primary" id="loadMoreBtn" style="display:none;">Ladda fler</button>
-      <button class="btn-export" id="exportBtn">Exportera CSV</button>
+      <div class="export-row">
+        <button class="btn-export" id="exportAllBtn">Exportera alla (CSV)</button>
+        <button class="btn-export" id="exportFavBtn" style="display:none;">Exportera favoriter (CSV)</button>
+      </div>
     </div>
   </main>
 
   <script>
-    const form = document.getElementById('searchForm');
-    const statusEl = document.getElementById('status');
-    const resultsEl = document.getElementById('results');
-    const exportWrap = document.getElementById('exportWrap');
-    const exportBtn = document.getElementById('exportBtn');
-    const searchBtn = document.getElementById('searchBtn');
-    const tokenInput = document.getElementById('token');
-    const tokenBtn = document.getElementById('tokenBtn');
-    const tokenStatus = document.getElementById('tokenStatus');
-    const filterBar = document.getElementById('filterBar');
-    const filterHireable = document.getElementById('filterHireable');
+    const $ = id => document.getElementById(id);
+    const form = $('searchForm');
+    const statusEl = $('status');
+    const resultsEl = $('results');
+    const exportWrap = $('exportWrap');
+    const exportAllBtn = $('exportAllBtn');
+    const exportFavBtn = $('exportFavBtn');
+    const searchBtn = $('searchBtn');
+    const tokenInput = $('token');
+    const tokenBtn = $('tokenBtn');
+    const tokenStatus = $('tokenStatus');
+    const toolbar = $('toolbar');
+    const filterHireable = $('filterHireable');
+    const filterFavorites = $('filterFavorites');
+    const sortSelect = $('sortSelect');
+    const loadMoreBtn = $('loadMoreBtn');
+    const rateLimitEl = $('rateLimit');
 
     let candidates = [];
+    let favorites = new Set();
     let currentQuery = '';
     let currentPage = 1;
     let totalCount = 0;
     const perPage = 10;
 
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    loadMoreBtn.addEventListener('click', () => loadMore());
+    // --- Saved search ---
+    const searchFields = ['keyword', 'language', 'location', 'repos', 'followers'];
+
+    function saveSearch() {
+      const data = {};
+      searchFields.forEach(id => { data[id] = $(id).value; });
+      localStorage.setItem('gh_last_search', JSON.stringify(data));
+    }
+
+    function loadSearch() {
+      try {
+        const data = JSON.parse(localStorage.getItem('gh_last_search'));
+        if (!data) return;
+        searchFields.forEach(id => {
+          if (data[id]) $(id).value = data[id];
+        });
+      } catch {}
+    }
+
+    loadSearch();
 
     // --- Token management ---
     function getToken() {
@@ -445,6 +519,20 @@
 
     loadTokenUI();
 
+    // --- Rate limit ---
+    function updateRateLimit(res) {
+      const remaining = res.headers.get('X-RateLimit-Remaining');
+      const reset = res.headers.get('X-RateLimit-Reset');
+      if (remaining === null) return;
+
+      const rem = parseInt(remaining, 10);
+      const resetDate = reset ? new Date(parseInt(reset, 10) * 1000) : null;
+      const resetMin = resetDate ? Math.max(1, Math.ceil((resetDate - Date.now()) / 60000)) : '?';
+
+      rateLimitEl.textContent = `API: ${rem} anrop kvar (nollställs om ${resetMin} min)`;
+      rateLimitEl.className = 'rate-limit' + (rem <= 5 ? ' danger' : rem <= 15 ? ' warn' : '');
+    }
+
     // --- Auth headers ---
     function apiHeaders() {
       const h = { 'Accept': 'application/vnd.github.v3+json' };
@@ -453,24 +541,28 @@
       return h;
     }
 
-    // --- Search ---
+    // --- Events ---
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      saveSearch();
       await search();
     });
 
-    exportBtn.addEventListener('click', () => downloadCSV());
+    exportAllBtn.addEventListener('click', () => downloadCSV(false));
+    exportFavBtn.addEventListener('click', () => downloadCSV(true));
+    loadMoreBtn.addEventListener('click', () => loadMore());
 
-    filterHireable.addEventListener('change', () => {
-      renderCards(candidates);
-    });
+    filterHireable.addEventListener('change', () => renderCards(candidates));
+    filterFavorites.addEventListener('change', () => renderCards(candidates));
+    sortSelect.addEventListener('change', () => renderCards(candidates));
 
+    // --- Search ---
     async function search() {
-      const keyword = document.getElementById('keyword').value.trim();
-      const lang = document.getElementById('language').value.trim();
-      const loc = document.getElementById('location').value.trim();
-      const repos = document.getElementById('repos').value.trim();
-      const followers = document.getElementById('followers').value.trim();
+      const keyword = $('keyword').value.trim();
+      const lang = $('language').value.trim();
+      const loc = $('location').value.trim();
+      const repos = $('repos').value.trim();
+      const followers = $('followers').value.trim();
 
       const parts = [];
       if (keyword) parts.push(keyword);
@@ -488,11 +580,14 @@
       currentPage = 1;
       totalCount = 0;
       candidates = [];
+      favorites = new Set();
       resultsEl.innerHTML = '';
       exportWrap.style.display = 'none';
       loadMoreBtn.style.display = 'none';
-      filterBar.style.display = 'none';
+      toolbar.style.display = 'none';
       filterHireable.checked = false;
+      filterFavorites.checked = false;
+      sortSelect.value = '';
 
       await fetchPage();
     }
@@ -512,6 +607,8 @@
           `https://api.github.com/search/users?q=${encodeURIComponent(currentQuery)}&per_page=${perPage}&page=${currentPage}`,
           { headers: apiHeaders() }
         );
+
+        updateRateLimit(res);
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
@@ -550,7 +647,7 @@
         }
 
         setStatus(statusText());
-        filterBar.style.display = 'flex';
+        toolbar.style.display = 'flex';
         renderCards(candidates);
         exportWrap.style.display = 'block';
 
@@ -575,6 +672,7 @@
         const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
           headers: apiHeaders()
         });
+        updateRateLimit(res);
         if (!res.ok) return null;
         return await res.json();
       } catch {
@@ -587,39 +685,81 @@
       statusEl.className = 'status' + (isError ? ' error' : '');
     }
 
+    // --- Favorites ---
+    function toggleFavorite(login) {
+      if (favorites.has(login)) favorites.delete(login);
+      else favorites.add(login);
+      updateFavUI();
+    }
+
+    function updateFavUI() {
+      document.querySelectorAll('.star-btn').forEach(btn => {
+        const login = btn.dataset.login;
+        btn.classList.toggle('active', favorites.has(login));
+        btn.textContent = favorites.has(login) ? '\u2605' : '\u2606';
+      });
+      exportFavBtn.style.display = favorites.size > 0 ? 'inline-block' : 'none';
+    }
+
+    // --- Sorting ---
+    function sortedCandidates(list) {
+      const val = sortSelect.value;
+      if (!val) return list;
+      const copy = [...list];
+      if (val === 'followers') copy.sort((a, b) => b.followers - a.followers);
+      else if (val === 'repos') copy.sort((a, b) => b.public_repos - a.public_repos);
+      else if (val === 'updated') copy.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      return copy;
+    }
+
+    // --- Render ---
     function renderCards(users) {
       let filtered = users;
-      if (filterHireable.checked) {
-        filtered = users.filter(u => u.hireable);
-      }
+      if (filterHireable.checked) filtered = filtered.filter(u => u.hireable);
+      if (filterFavorites.checked) filtered = filtered.filter(u => favorites.has(u.login));
+      filtered = sortedCandidates(filtered);
 
       if (filtered.length === 0) {
         resultsEl.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Inga kandidater matchar filtret.</p>';
         return;
       }
 
-      resultsEl.innerHTML = filtered.map(u => `
+      resultsEl.innerHTML = filtered.map(u => {
+        const name = u.name || u.login;
+        const linkedinQuery = encodeURIComponent(`site:linkedin.com/in "${name}"`);
+        const isFav = favorites.has(u.login);
+        return `
         <div class="card">
+          <button class="star-btn ${isFav ? 'active' : ''}" data-login="${esc(u.login)}" title="Favorit">${isFav ? '\u2605' : '\u2606'}</button>
           <div class="card-header">
             <img src="${u.avatar_url}" alt="${esc(u.login)}">
             <div>
               <div class="name-row">
-                <span class="name">${esc(u.name || u.login)}</span>
+                <span class="name">${esc(name)}</span>
                 ${u.hireable ? '<span class="badge-hireable">Öppen för jobb</span>' : ''}
               </div>
               <div class="username">@${esc(u.login)}</div>
             </div>
           </div>
           ${u.bio ? `<div class="bio">${esc(u.bio)}</div>` : ''}
-          ${u.location ? `<div class="location">&#128205; ${esc(u.location)}</div>` : ''}
-          ${u.email ? `<div class="location">&#9993; <a href="mailto:${esc(u.email)}" style="color:inherit;">${esc(u.email)}</a></div>` : ''}
+          ${u.location ? `<div class="meta-line">&#128205; ${esc(u.location)}</div>` : ''}
+          ${u.email ? `<div class="meta-line">&#9993; <a href="mailto:${esc(u.email)}" style="color:inherit;">${esc(u.email)}</a></div>` : ''}
           <div class="stats">
             <span>&#128230; ${u.public_repos} repos</span>
             <span>&#128101; ${u.followers} followers</span>
           </div>
-          <a href="${u.html_url}" target="_blank" rel="noopener">Visa profil &rarr;</a>
-        </div>
-      `).join('');
+          <div class="card-links">
+            <a href="${u.html_url}" target="_blank" rel="noopener">GitHub &rarr;</a>
+            <a class="linkedin-link" href="https://www.google.com/search?q=${linkedinQuery}" target="_blank" rel="noopener">LinkedIn &rarr;</a>
+          </div>
+        </div>`;
+      }).join('');
+
+      resultsEl.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          toggleFavorite(btn.dataset.login);
+        });
+      });
     }
 
     function esc(str) {
@@ -628,11 +768,12 @@
       return d.innerHTML;
     }
 
-    function downloadCSV() {
+    // --- CSV export ---
+    function downloadCSV(onlyFavorites) {
       let data = candidates;
-      if (filterHireable.checked) {
-        data = candidates.filter(u => u.hireable);
-      }
+      if (filterHireable.checked) data = data.filter(u => u.hireable);
+      if (onlyFavorites) data = data.filter(u => favorites.has(u.login));
+
       const header = 'username,name,email,bio,location,repos,followers,hireable,profile_url';
       const rows = data.map(u =>
         [u.login, u.name || '', u.email || '', u.bio || '', u.location || '', u.public_repos, u.followers, u.hireable ? 'yes' : 'no', u.html_url]
@@ -644,7 +785,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'github-kandidater.csv';
+      a.download = onlyFavorites ? 'github-favoriter.csv' : 'github-kandidater.csv';
       a.click();
       URL.revokeObjectURL(url);
     }
