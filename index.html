@@ -463,7 +463,7 @@
     let currentQuery = '';
     let currentPage = 1;
     let totalCount = 0;
-    const perPage = 10;
+    const perPage = 30;
 
     // --- Saved search ---
     const searchFields = ['keyword', 'language', 'location', 'repos', 'followers'];
@@ -646,13 +646,23 @@
           return;
         }
 
-        setStatus(statusText());
+        const loaded = currentPage * perPage;
+        const hasMore = loaded < totalCount && data.items.length === perPage;
+
+        setStatus(hasMore
+          ? `<span class="spinner"></span> Hämtar fler... (${candidates.length} av ${totalCount})`
+          : statusText()
+        );
         toolbar.style.display = 'flex';
         renderCards(candidates);
         exportWrap.style.display = 'block';
+        loadMoreBtn.style.display = 'none';
 
-        const loaded = currentPage * perPage;
-        loadMoreBtn.style.display = loaded < totalCount ? 'inline-block' : 'none';
+        if (hasMore) {
+          currentPage++;
+          await fetchPage();
+          return;
+        }
       } catch (err) {
         setStatus(`Fel: ${err.message}`, true);
       } finally {
@@ -663,8 +673,11 @@
 
     function statusText() {
       const hireableCount = candidates.filter(u => u.hireable).length;
-      const showing = `Visar ${candidates.length} av ${totalCount} träffar`;
-      return showing + (hireableCount > 0 ? ` (${hireableCount} öppna för jobb).` : '.');
+      const accessible = Math.min(totalCount, currentPage * perPage);
+      const failed = accessible - candidates.length;
+      let showing = `Visar ${candidates.length} av ${totalCount} träffar`;
+      if (failed > 0) showing += ` (${failed} kunde inte hämtas)`;
+      return showing + (hireableCount > 0 ? ` — ${hireableCount} öppna för jobb.` : '.');
     }
 
     async function fetchUser(username) {
