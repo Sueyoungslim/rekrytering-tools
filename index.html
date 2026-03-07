@@ -127,29 +127,11 @@
       color: var(--text-muted);
     }
 
-    .help-box summary {
-      font-weight: 600;
+    .help-box .help-box-title {
+      font-weight: 700;
       font-size: 0.85rem;
       color: var(--text);
-      cursor: pointer;
-      user-select: none;
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .help-box summary::-webkit-details-marker { display: none; }
-
-    .help-box summary::before {
-      content: '▶';
-      font-size: 0.65rem;
-      transition: transform 0.2s;
-      display: inline-block;
-    }
-
-    .help-box[open] summary::before {
-      transform: rotate(90deg);
+      margin-bottom: 0.85rem;
     }
 
     .help-box .help-grid {
@@ -456,8 +438,8 @@
       <span class="rate-limit" id="rateLimit"></span>
     </div>
 
-    <details class="help-box">
-      <summary>Söktips &amp; exempel</summary>
+    <div class="help-box">
+      <div class="help-box-title">Söktips &amp; exempel</div>
       <div class="help-grid">
         <div>
           <h4>Fritextsökning</h4>
@@ -488,7 +470,7 @@
           </ul>
         </div>
       </div>
-    </details>
+    </div>
 
     <form class="search-form" id="searchForm">
       <div class="field field-wide">
