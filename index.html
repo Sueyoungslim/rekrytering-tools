@@ -115,6 +115,76 @@
     .rate-limit.warn { color: var(--yellow); font-weight: 600; }
     .rate-limit.danger { color: #dc2626; font-weight: 600; }
 
+    /* Help box */
+    .help-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .help-box summary {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .help-box summary::-webkit-details-marker { display: none; }
+
+    .help-box summary::before {
+      content: '▶';
+      font-size: 0.65rem;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .help-box[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .help-box .help-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 0.85rem;
+    }
+
+    .help-box h4 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .help-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .help-box ul li code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: var(--primary);
+    }
+
     /* Search form */
     .search-form {
       background: var(--surface);
@@ -385,6 +455,40 @@
       <button class="btn-secondary" type="button" id="tokenBtn">Spara</button>
       <span class="rate-limit" id="rateLimit"></span>
     </div>
+
+    <details class="help-box">
+      <summary>Söktips &amp; exempel</summary>
+      <div class="help-grid">
+        <div>
+          <h4>Fritextsökning</h4>
+          <ul>
+            <li>Flera ord = AND: <code>react typescript</code></li>
+            <li>Antingen/eller: <code>react OR vue</code></li>
+            <li>Uteslut ord: <code>fullstack NOT junior</code></li>
+            <li>Exakt fras: <code>"machine learning"</code></li>
+            <li>Kombinera: <code>"senior developer" OR "lead engineer"</code></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Övriga fält</h4>
+          <ul>
+            <li><strong>Språk</strong> — ett språk i taget, t.ex. <code>python</code></li>
+            <li><strong>Location</strong> — fritext, t.ex. <code>stockholm</code> eller <code>sweden</code></li>
+            <li><strong>Min repos</strong> — filterar bort inaktiva konton</li>
+            <li><strong>Min followers</strong> — indikator på synlighet i communityn</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Tips</h4>
+          <ul>
+            <li>Lägg till ett API-token för fler sökningar (5 000/timme vs 60)</li>
+            <li>Använd stjärnan ★ för att spara favoriter</li>
+            <li>Exportera resultat eller favoriter som CSV</li>
+            <li>Senaste sökning sparas automatiskt</li>
+          </ul>
+        </div>
+      </div>
+    </details>
 
     <form class="search-form" id="searchForm">
       <div class="field field-wide">
